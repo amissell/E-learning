@@ -2,6 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\TagController;
+
+
+use App\Http\Controllers\CourseController;
+
+
 
 
 Route::get('/', function () {
@@ -10,7 +16,4 @@ Route::get('/', function () {
 
 
 
-Route::middleware('auth:sanctum')
-    ->get('/api/user', function (Request $request) {
-        return $request->user();
-    });
+
