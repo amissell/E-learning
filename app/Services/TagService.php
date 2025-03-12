@@ -2,15 +2,25 @@
 
 namespace App\Services;
 
-use App\Interfaces\BaseRepositoryInterface;
+use App\Repositories\TagRepository;
 
 class TagService
 {
     protected $tagRepository;
 
-    public function __construct(BaseRepositoryInterface $tagRepository)
+    public function __construct(TagRepository $tagRepository)
     {
         $this->tagRepository = $tagRepository;
+    }
+
+    public function getAllTags()
+    {
+        return $this->tagRepository->getAll();
+    }
+
+    public function getTagDetails($id)
+    {
+        return $this->tagRepository->getById($id);
     }
 
     public function createTag(array $data)
@@ -23,8 +33,8 @@ class TagService
         return $this->tagRepository->update($id, $data);
     }
 
-    public function getTagDetails($id)
+    public function deleteTag($id)
     {
-        return $this->tagRepository->getById($id);
+        return $this->tagRepository->delete($id);
     }
 }
