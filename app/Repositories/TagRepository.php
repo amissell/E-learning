@@ -3,19 +3,39 @@
 namespace App\Repositories;
 
 use App\Models\tag;
+use App\Interfaces\BaseRepositoryInterface;
 
-class TagRepository
+class TagRepository implements BaseRepositoryInterface
 {
-    /**
-     * @var Tag
-     */
+  public function getAll()
+  {
+      return Tag::all();
+  }
 
-     protected $tag;
-     /**
-      * @param Tag $Tag
-      */
-    public function __construct(Tag $tag)
-    {
-        $this->tag = $tag;
-    }
+  public function getById($id)
+  {
+      return Tag::find($id); 
+  }
+
+  public function create(array $data)
+  {
+      return Tag::create($data);
+  }
+
+  public function update($id, array $data)
+  {
+      $tag = Tag::find($id);
+      $tag->update($data);
+      return $tag;
+  }
+
+  public function delete($id)
+  {
+      $tag = Tag::find($id);
+      $tag->delete();
+      return true;
+  }
+
+
+
 }
