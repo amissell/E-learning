@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Interfaces\BaseRepositoryInterface;
+use App\Interface\BaseRepositoryInterface;
 use App\Repositories\TagRepository;
 
 

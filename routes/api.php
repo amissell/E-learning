@@ -12,8 +12,4 @@ Route::get('/user', function (Request $request) {
 
 
 
-Route::get('/tags', [TagController::class, 'index']);
-Route::get('/tags/{id}', [TagController::class, 'show']);
-Route::post('/tags', [TagController::class, 'store']);
-Route::put('/tags/{id}', [TagController::class, 'update']);
-Route::delete('/tags/{id}', [TagController::class, 'destroy']);
+Route::apiResource('/tags', TagController::class);

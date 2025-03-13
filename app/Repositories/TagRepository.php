@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\tag;
-use App\Interfaces\BaseRepositoryInterface;
+use App\Interface\BaseRepositoryInterface;
 
 class TagRepository implements BaseRepositoryInterface
 {
