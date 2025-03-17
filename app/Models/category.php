@@ -2,26 +2,28 @@
 
 namespace App\Models;
 
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class category extends Model
+class Category extends Model
 {
+    use HasFactory;
 
-  use HasFactory;
+    protected $fillable = ['name', 'parent_id'];
 
+    /**
+     * A category can have multiple subcategories.
+     */
+    public function children()
+    {
+        return $this->hasMany(Category::class, 'parent_id');
+    }
 
-  protected $fillable = ['name', 'parent_id'];
-
-  // a category can have multiple subcategory
-  public function children()
-  {
-    return $this->hasMany(category::class, 'parent_id')->with('children');
-  }
-
-
-  public function parent(){
-    return $this->belongsTo(category::class, 'parent_id');
-  }
+    /**
+     * A category can have one parent category.
+     */
+    public function parent()
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
 }
