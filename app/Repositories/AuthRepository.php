@@ -14,29 +14,38 @@ class AuthRepository implements AuthRepositoryInterface
   {
     $fields = $request->validate([
       'name' => 'required|max:255',
-      'email'=> 'required|email|unique:users',
-      'password' => 'required|confirmed'
+      'email' => 'required|email|unique:users',
+      'password' => 'required|confirmed',
+      'image' => 'required|image|mimes:jpeg,png,jpg|max:2048'
     ]);
 
-    $user = User::create($fields);
+    $imagePath = $request->file('image')->store('profile_images', 'public');
+
+    $user = User::create([
+      'name' => $fields['name'],
+      'email' => $fields['email'],
+      'password' => bcrypt($fields['password']),
+      'image' => $imagePath,
+    ]);
+
     $token = $user->createToken($request->name);
     return [
       'user' => $user,
       'token' => $token->plainTextToken,
+      'image_url' => asset('storage/' . $user->image),
     ];
   }
 
   public function login(Request $request)
   {
     $request->validate([
-      'email'=> 'required|email|exists:users',
+      'email' => 'required|email|exists:users',
       'password' => 'required'
     ]);
-    
+
     $user = User::where('email', $request->email)->first();
 
-    if (!$user || !Hash::check($request->password, $user->password))
-    {
+    if (!$user || !Hash::check($request->password, $user->password)) {
       return [
         'message' => 'The provided credentials are incorrect!'
       ];
@@ -48,7 +57,7 @@ class AuthRepository implements AuthRepositoryInterface
       'token' => $token->plainTextToken,
     ];
   }
-  
+
   public function logout(Request $request)
   {
     $request->user()->tokens()->delete();
