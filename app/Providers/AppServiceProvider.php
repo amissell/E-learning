@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Interface\BaseRepositoryInterface;
 use App\Repositories\TagRepository;
+use App\interface\AuthRepositoryInterface;
+use App\Repositories\AuthRepository;
 
 
 /**
@@ -23,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(BaseRepositoryInterface::class, TagRepository::class);
+        $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
+
     }
 
     /**
