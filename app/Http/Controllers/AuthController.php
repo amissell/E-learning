@@ -28,4 +28,14 @@ class AuthController extends Controller
     {
         return response()->json($this->authService->logout($request), 200);
     }
+
+    public function refreshToken(Request $request)
+    {
+        return response()->json($this->authService->refreshToken($request), 200);
+    }
+
+    public function getDetailsUsers(Request $request)
+    {
+        return response()->json($this->authService->getDetailsUsers($request), 200);
+    }
 }

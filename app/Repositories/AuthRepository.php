@@ -32,8 +32,10 @@ class AuthRepository implements AuthRepositoryInterface
     return [
       'user' => $user,
       'token' => $token->plainTextToken,
-      'image_url' => asset('storage/' . $user->image),
+      'image_url' => asset('storage/' . $user->image)
     ];
+    $user->assignRole('student');
+    return response()->json(['message' => 'User registered successfully']);
   }
 
   public function login(Request $request)

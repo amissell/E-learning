@@ -28,4 +28,15 @@ class AuthService
     {
         return $this->authRepository->logout($request);
     }
+    
+    
+    public function refreshToken(Request $request)
+    {
+        return $this->authRepository->refreshToken();
+    }
+
+    public function getDetailsUsers(Request $request)
+    {
+        return $this->authRepository->getDetailsUsers();
+    }
 }
