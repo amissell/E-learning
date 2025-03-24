@@ -2,11 +2,14 @@
 
 namespace App\Repositories;
 
+use Carbon\Carbon;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use App\interface\AuthRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\PersonalAccessToken;
+use App\interface\AuthRepositoryInterface;
+
 
 class AuthRepository implements AuthRepositoryInterface
 {
@@ -58,6 +61,25 @@ class AuthRepository implements AuthRepositoryInterface
       'user' => $user,
       'token' => $token->plainTextToken,
     ];
+
+    $user = Auth::user();
+    $user->tokens()->delete;
+    $accessTokenExpiresAt = Carbon::now()->addDays(1);
+    $refreshTokenExpiresAt = Carbon::now()->addDays(7);
+
+    $accessToken = $user->createToken('access_token', ['*'], $accessTokenExpiresAt)->plainTextToken;
+    $refreshToken = $user->createToken('refresh_token', ['refresh'], $refreshTokenExpiresAt)->plainTextToken;
+
+
+    return response()->json(
+      [
+        'access_token' => $accessToken,
+        'access_token_expires_at' => $accessTokenExpiresAt,
+        'refresh_token' => $refreshToken,
+        'refresh_token_expires_at' => $refreshTokenExpiresAt,
+        'token_type' => 'Bearer',
+      ]
+      );
   }
 
   public function logout(Request $request)
@@ -68,4 +90,32 @@ class AuthRepository implements AuthRepositoryInterface
       'message' => 'you are logged out !'
     ];
   }
+
+  public function refreshToken(Request $request)
+    {
+        $currentRefreshToken = $request->bearerToken();
+        $refreshToken = PersonalAccessToken::findToken($currentRefreshToken);
+
+        if (!$refreshToken || !$refreshToken->can('refresh') || $refreshToken->expires_at->isPast()) {
+            return response()->json(['error' => 'Invalid or expired refresh token'], 401);
+        }
+
+        $user = $refreshToken->tokenable;
+        $refreshToken->delete();
+
+        $accessTokenExpiresAt = Carbon::now()->addDays(1);
+        $refreshTokenExpiresAt = Carbon::now()->addDays(7);
+
+        $newAccessToken = $user->createToken('access_token', ['*'], $accessTokenExpiresAt)->plainTextToken;
+        $newRefreshToken = $user->createToken('refresh_token', ['refresh'], $refreshTokenExpiresAt)->plainTextToken;
+
+        return response()->json([
+            'access_token' => $newAccessToken,
+            'access_token_expires_at' => $accessTokenExpiresAt,
+            'refresh_token' => $newRefreshToken,
+            'refresh_token_expires_at' => $refreshTokenExpiresAt,
+            'token_type' => 'Bearer',
+        ]);
+    }
+
 }

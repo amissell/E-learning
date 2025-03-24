@@ -26,8 +26,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::post('/refresh-token', [AuthController::class, 'refreshToken'])->middleware('auth:sanctum');
-Route::get('/user-details', [AuthController::class, 'getDetailsUsers'])->middleware('auth:sanctum');
+Route::post('/refresh', [AuthController::class, 'refreshToken']);
+// Route::get('/user-details', [AuthController::class, 'getDetailsUsers'])->middleware('auth:sanctum');
 
 Route::middleware(['auth:sanctum', 'role:admin'])->get('/admin', function () {
   return response()->json(['message' => 'Welcome, Admin!']);
@@ -40,3 +40,4 @@ Route::middleware('auth:sanctum')->group(function () {
   Route::put('/enrollments/{id}', [EnrollmentController::class, 'updateEnrollment'])->middleware('role:admin|mentor');
   Route::delete('/enrollments/{id}', [EnrollmentController::class, 'deleteEnrollment'])->middleware('role:admin|mentor');
 });
+
