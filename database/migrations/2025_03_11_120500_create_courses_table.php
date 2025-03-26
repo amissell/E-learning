@@ -17,11 +17,7 @@ return new class extends Migration
             $table->text('description');
             $table->integer('duration');
             $table->string('level');
-            $table->unsignedBigInteger('category_id');
-            $table->unsignedBigInteger('sub_category_id')->nullable();
             $table->timestamps();
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
-            $table->foreign('sub_category_id')->references('id')->on('categories')->onDelete('cascade');
         }); 
     }
 

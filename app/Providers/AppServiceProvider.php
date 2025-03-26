@@ -2,13 +2,16 @@
 
 namespace App\Providers;
 
+use CourseRepository;
 use Laravel\Sanctum\Sanctum;
 use App\Repositories\TagRepository;
 use App\Repositories\AuthRepository;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Sanctum\PersonalAccessToken;
 use App\interface\AuthRepositoryInterface;
 use App\Interface\BaseRepositoryInterface;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 
 /**
@@ -30,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AuthRepositoryInterface::class, AuthRepository::class);
         $this->app->bind(
           \App\Interface\BaseRepositoryInterface::class,
-          \App\Repositories\CourseRepository::class
+          // \App\Repositories\CourseRepository::class
       );
 
     }
@@ -41,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
       Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+      Route::middleware('auth:sanctum', EnsureFrontendRequestsAreStateful::class);
 
     }
 }

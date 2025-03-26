@@ -2,60 +2,61 @@
 
 namespace App\Services;
 
-use App\Interface\BaseRepositoryInterface;
 use App\Models\Course;
 
 class CourseService
 {
-    protected $courseRepository;
+  public function getAllCourses()
+  {
+      return Course::with('tags')->get(); // Returns all courses with their associated tags
+  }
 
-    public function __construct(BaseRepositoryInterface $courseRepo)
-    {
-        $this->courseRepository = $courseRepo;
-    }
+  public function getCourseDetails($id)
+  {
+      return Course::with('tags')->findOrFail($id); // Retrieve course details along with tags
+  }
 
-    /**
-     * Get all courses.
-     */
-    public function getAllCourses()
-    {
-        return $this->courseRepository->getAll();
-    }
+  public function createCourse($data)
+  {
+      $course = Course::create([
+          'name' => $data['name'],
+          'description' => $data['description'],
+          'duration' => $data['duration'],
+          'level' => $data['level']
+      ]);
 
-    /**
-     * Get a specific course by ID.
-     */
-    public function getCourseById($id)
-    {
-        return $this->courseRepository->getById($id);
-    }
+      // Attach tags if provided
+      if (isset($data['tags'])) {
+          $course->tags()->sync($data['tags']);
+      }
 
-    /**
-     * Create a new course.
-     */
-    public function createCourse(array $data)
-    {
-        // Business logic can be added here
-        // For example, checking if the course already exists
+      return $course;
+  }
 
-        return $this->courseRepository->create($data);
-    }
+  public function updateCourse($id, $data)
+  {
+      $course = Course::findOrFail($id);
+      $course->update([
+          'name' => $data['name'] ?? $course->name,
+          'description' => $data['description'] ?? $course->description,
+          'duration' => $data['duration'] ?? $course->duration,
+          'level' => $data['level'] ?? $course->level
+      ]);
 
-    /**
-     * Update a course by ID.
-     */
-    public function updateCourse($id, array $data)
-    {
-        // Business logic can be added here (e.g., validation, logging, etc.)
+      // Sync tags if provided
+      if (isset($data['tags'])) {
+          $course->tags()->sync($data['tags']);
+      }
 
-        return $this->courseRepository->update($id, $data);
-    }
+      return $course;
+  }
 
-    /**
-     * Delete a course by ID.
-     */
-    public function deleteCourse($id)
-    {
-        return $this->courseRepository->delete($id);
-    }
+  public function deleteCourse($id)
+  {
+      $course = Course::findOrFail($id);
+      $course->tags()->detach(); // Detach tags first
+      $course->delete(); // Then delete course
+
+      return true;
+  }
 }

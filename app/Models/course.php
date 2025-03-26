@@ -9,21 +9,10 @@ class course extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'duration', 'level', 'category_id', 'subcategory_id'];
+    protected $fillable = ['name', 'description', 'duration', 'level'];
 
     public function tags()
     {
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Tag::class, 'course_tag');
     }
-
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function subcategory()
-    {
-        return $this->belongsTo(Category::class, 'subcategory_id');
-    }
-
 }

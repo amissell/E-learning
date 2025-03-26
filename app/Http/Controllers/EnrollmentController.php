@@ -2,64 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\course;
+use App\Models\Course;
 use App\Models\Enrollment;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 
 class EnrollmentController extends Controller
 {
-  public function enroll($courseId)
-  {
-      $user = Auth::user();
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+    }
 
-      // Check if course exists
-      $course = Course::findOrFail($courseId);
+    public function enroll(Request $request, $courseId)
+    {
+        $user = Auth::user();
 
-      // Check if user is already enrolled
-      if (Enrollment::where('user_id', $user->id)->where('course_id', $courseId)->exists()) {
-          return response()->json(['message' => 'Already enrolled'], 400);
-      }
+        // dd($user->getRoleNames()); 
 
-      // Create enrollment
-      $enrollment = Enrollment::create([
-          'user_id' => $user->id,
-          'course_id' => $course->id,
-          'status' => 'pending'
-      ]);
+        if (!$user->hasRole('student')) {
+            return response()->json(['message' => 'You are not authorized to enroll in courses.'], 403);
+        }
 
-      return response()->json(['message' => 'Enrollment request submitted', 'enrollment' => $enrollment], 201);
-  }
+        $course = Course::findOrFail($courseId);
 
-  // List all enrollments for a course (Admin/Mentor)
-  public function listEnrollments($courseId)
-  {
-      $course = Course::findOrFail($courseId);
-      $enrollments = Enrollment::where('course_id', $courseId)->with('user')->get();
+        if ($user->courses->contains($course)) {
+            return response()->json(['message' => 'You are already enrolled in this course.'], 400);
+        }
 
-      return response()->json($enrollments);
-  }
+        Enrollment::create([
+            'user_id' => $user->id,
+            'course_id' => $course->id,
+            'status' => 'pending'
+        ]);
 
-  // Update enrollment status (Admin/Mentor)
-  public function updateEnrollment($id, Request $request)
-  {
-      $request->validate(['status' => 'required|in:pending,accepted,rejected']);
-
-      $enrollment = Enrollment::findOrFail($id);
-      $enrollment->status = $request->status;
-      $enrollment->save();
-
-      return response()->json(['message' => 'Enrollment updated successfully', 'enrollment' => $enrollment]);
-  }
-
-  // Delete enrollment
-  public function deleteEnrollment($id)
-  {
-      $enrollment = Enrollment::findOrFail($id);
-      $enrollment->delete();
-
-      return response()->json(['message' => 'Enrollment deleted successfully']);
-  }
+        return response()->json(['message' => 'You have successfully enrolled in the course.'], 200);
+    }
 }
